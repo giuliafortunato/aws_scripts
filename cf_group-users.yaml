@@ -1,1 +1,21 @@
-#teste
+Resources:
+
+  GrupoDev:
+    Type: 'AWS::IAM::Group'
+    Properties:
+      GroupName: dev
+      Policies:
+      - PolicyName: GroupPolicyDevCF
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action: "*"
+            Resource: "*"
+
+  GrupoProd:
+    Type: 'AWS::IAM::Group'
+    Properties:
+      GroupName: prod
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonEC2FullAccess
