@@ -1,0 +1,90 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Criando uma rede de aplicação
+
+Parameters:
+
+  VPCName:
+    Description: VPC name
+    Type: String
+    Default: "My-CF-VPC"
+
+  SubnetName:
+    Description: Subtnet name
+    Type: String
+
+
+
+Mappings:
+
+  VPCConfig:
+    VPC:
+      CIDR: '10.42.0.0/16'
+    Public-Web-Subtnet:
+      CIDR: '10.42.1.0/24'
+    Private-App-Subnet:
+      CIDR: '10.42.2.0/24'
+    Private-DB-Subnet:
+      CIDR: '10.42.3.0/24'
+
+  AZRegion:
+    us-east-1:
+      AZs: ["a", "b", "c"]
+
+#Rules:
+
+#Conditions:
+
+Resources:
+
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      CidrBlock: 
+        Fn::FindInMap:
+          - VPCConfig
+          - VPC
+          - CIDR
+      Tags:
+        - Key: Name
+          Value: !Ref 'VPCName'
+
+  #AZ: A, B, and C
+  PublicWebSubtnet1: 
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Ref: VPC
+      AvailabilityZone: !Sub 
+          - '${AWS::Region}${AZ}'
+          - AZ: !Select [0, !FindInMap [ AZRegion, !Ref 'AWS::Region', AZs ]]
+      CidrBlock:
+        Fn::FindInMap:
+          - VPCConfig
+          - Public-Web-Subtnet
+          - CIDR
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Ref 'SubnetName'
+
+  #Private-App-Subnet1:
+
+  #Private-DB-Subnet1:
+
+  ##Add corresponding Subnets##
+  #Public-Web-RouteTable: #ADD Internet-Gateway
+
+  #Private-App-RouteTable: #ADD NAT-Gateway
+
+  #Private-DB-RouteTable: #ADD NAT-Gateway
+
+  #Internet-Gateway:
+
+  #ADD to Public-Web-Subtnet1 / ADD Elastic IP
+  #NAT-Gateway:
+
+#Metadata:
+
+#Outputs:
