@@ -8,22 +8,29 @@ Parameters:
     Type: String
     Default: "My-CF-VPC"
 
-  SubnetName:
-    Description: Subtnet name
-    Type: String
-
-
 
 Mappings:
 
   VPCConfig:
     VPC:
       CIDR: '10.42.0.0/16'
-    Public-Web-Subtnet:
+    Public-Web-Subnet1:
       CIDR: '10.42.1.0/24'
-    Private-App-Subnet:
+    Public-Web-Subnet2:
+      CIDR: '10.42.1.0/24'
+    Public-Web-Subnet3:
+      CIDR: '10.42.1.0/24'
+    Private-App-Subnet1:
       CIDR: '10.42.2.0/24'
-    Private-DB-Subnet:
+    Private-App-Subnet2:
+      CIDR: '10.42.2.0/24'
+    Private-App-Subnet3:
+      CIDR: '10.42.2.0/24'
+    Private-DB-Subnet1:
+      CIDR: '10.42.3.0/24'
+    Private-DB-Subnet2:
+      CIDR: '10.42.3.0/24'
+    Private-DB-Subnet3:
       CIDR: '10.42.3.0/24'
 
   AZRegion:
@@ -51,6 +58,7 @@ Resources:
           Value: !Ref 'VPCName'
 
   #AZ: A, B, and C
+
   PublicWebSubtnet1: 
     Type: AWS::EC2::Subnet
     Properties:
@@ -62,12 +70,102 @@ Resources:
       CidrBlock:
         Fn::FindInMap:
           - VPCConfig
-          - Public-Web-Subtnet
+          - Public-Web-Subnet1
           - CIDR
       MapPublicIpOnLaunch: true
       Tags:
         - Key: Name
-          Value: !Ref 'SubnetName'
+          Value: "PublicWebSubtnet1" 
+
+  PublicWebSubtnet2: 
+      Type: AWS::EC2::Subnet
+      Properties:
+        VpcId:
+          Ref: VPC
+        AvailabilityZone: !Sub 
+            - '${AWS::Region}${AZ}'
+            - AZ: !Select [1, !FindInMap [ AZRegion, !Ref 'AWS::Region', AZs ]]
+        CidrBlock:
+          Fn::FindInMap:
+            - VPCConfig
+            - Public-Web-Subnet2
+            - CIDR
+        MapPublicIpOnLaunch: true
+        Tags:
+          - Key: Name
+            Value: "PublicWebSubtnet2" 
+
+  PublicWebSubtnet3: 
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Ref: VPC
+      AvailabilityZone: !Sub 
+            - '${AWS::Region}${AZ}'
+            - AZ: !Select [2, !FindInMap [ AZRegion, !Ref 'AWS::Region', AZs ]]
+      CidrBlock:
+        Fn::FindInMap:
+          - VPCConfig
+          - Public-Web-Subnet3
+          - CIDR
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: "PublicWebSubtnet3" 
+
+  PublicAppSubtnet1: 
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Ref: VPC
+      AvailabilityZone: !Sub 
+          - '${AWS::Region}${AZ}'
+          - AZ: !Select [0, !FindInMap [ AZRegion, !Ref 'AWS::Region', AZs ]]
+      CidrBlock:
+        Fn::FindInMap:
+          - VPCConfig
+          - Private-App-Subnet1
+          - CIDR
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: "PublicAppSubtnet1" 
+
+  PublicAppSubtnet2: 
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+       Ref: VPC
+      AvailabilityZone: !Sub 
+          - '${AWS::Region}${AZ}'
+          - AZ: !Select [1, !FindInMap [ AZRegion, !Ref 'AWS::Region', AZs ]]
+      CidrBlock:
+        Fn::FindInMap:
+          - VPCConfig
+          - Private-App-Subnet2
+          - CIDR
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: "PublicAppSubnet2" 
+
+  PublicAppSubtnet3: 
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Ref: VPC
+      AvailabilityZone: !Sub 
+            - '${AWS::Region}${AZ}'
+            - AZ: !Select [2, !FindInMap [ AZRegion, !Ref 'AWS::Region', AZs ]]
+      CidrBlock:
+        Fn::FindInMap:
+          - VPCConfig
+          - Private-App-Subnet3
+          - CIDR
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: "PublicAppSubnet3"   
 
   #Private-App-Subnet1:
 
